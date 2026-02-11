@@ -1,65 +1,99 @@
-import Image from "next/image";
+"use client";
+
+import { usePortfolio } from "@/hooks/usePortfolio";
+import { Header } from "@/components/Header";
+import { CashInput } from "@/components/CashInput";
+import { ModeToggle } from "@/components/ModeToggle";
+import { AssetTable } from "@/components/AssetTable";
+import { DonutChart } from "@/components/DonutChart";
+import { RebalanceResultTable } from "@/components/RebalanceResult";
+import { WeightValidation } from "@/components/WeightValidation";
 
 export default function Home() {
+  const {
+    portfolio,
+    totalValue,
+    rebalancePlan,
+    projectedCash,
+    targetWeightSum,
+    isCalculated,
+    calculate,
+    addAsset,
+    updateAsset,
+    removeAsset,
+    setCash,
+    setRebalanceMode,
+  } = usePortfolio();
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto">
+      <Header />
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        {/* Left Column: Controls & Summary */}
+        <div className="space-y-6">
+          <div className="glass-panel p-6 rounded-xl space-y-4">
+            <h2 className="text-lg font-semibold">설정</h2>
+            <CashInput value={portfolio.cash} onChange={setCash} />
+            <ModeToggle mode={portfolio.rebalanceMode} onChange={setRebalanceMode} />
+          </div>
+
+          <div className="glass-panel p-6 rounded-xl">
+            <h2 className="text-lg font-semibold mb-4">요약</h2>
+            <div className="flex justify-between items-center py-2 border-b border-muted dark:border-white/5">
+              <span className="text-muted-foreground">총 자산</span>
+              <span className="font-bold text-xl">{totalValue.toLocaleString()}</span>
+            </div>
+            <div className="mt-4">
+              <WeightValidation totalWeight={Math.round(targetWeightSum * 100) / 100} />
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Center/Right: Data & Chart */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="md:col-span-2">
+              <AssetTable
+                assets={portfolio.assets}
+                totalValue={totalValue}
+                onUpdate={updateAsset}
+                onDelete={removeAsset}
+                onAdd={addAsset}
+              />
+            </div>
+          </div>
+
+          {/* Calculate Button - positioned right after the table */}
+          <div className="flex justify-center">
+            <button
+              onClick={calculate}
+              className="px-8 py-4 bg-primary text-primary-foreground font-bold rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 text-lg"
+            >
+              계산하기
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <DonutChart assets={portfolio.assets} totalValue={totalValue} />
+
+            <div className="glass-panel p-6 rounded-xl flex flex-col justify-center">
+              <h3 className="text-lg font-semibold mb-2">리밸런싱 전략</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                현재 모드: <span className="text-primary font-medium uppercase">{portfolio.rebalanceMode === "full" ? "전체 재조정" : "매도 없음"}</span>
+                <br />
+                {portfolio.rebalanceMode === "full"
+                  ? "목표 비중에 맞추기 위해 자산을 매수하거나 매도합니다."
+                  : "보유 현금 내에서 매수만 수행합니다. 기존 보유 자산은 매도하지 않습니다."}
+              </p>
+            </div>
+          </div>
         </div>
-      </main>
-    </div>
+      </div>
+
+      {isCalculated && (
+        <RebalanceResultTable plan={rebalancePlan} projectedCash={projectedCash} />
+      )}
+    </main>
   );
 }
