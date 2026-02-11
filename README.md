@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 포트폴리오 리밸런서 (Portfolio Rebalancer)
 
-## Getting Started
+정밀한 자산 배분과 포트폴리오 최적화를 위한 웹 애플리케이션입니다. 목표 비중을 설정하면 현재 자산 가치와 현금을 고려하여 최적의 매수/매도 수량을 계산.
 
-First, run the development server:
+## 주요 기능
+
+*   **정밀한 리밸런싱**: 목표 비중과 현재가를 기반으로 정확한 매매 수량 계산
+*   **리밸런싱 모드 지원**:
+    *   **전체 재조정**: 매수/매도를 모두 포함하여 목표 비중 달성
+    *   **매도 없음 (No Sell)**: 추가 매수만으로 비중 조절
+
+## 실행 방법
+
+### 설치
+프로젝트를 클론하고 의존성을 설치합니다.
+
+```bash
+git clone https://github.com/iaruru/port-sync.git
+cd port-sync
+npm install
+```
+
+### 실행
+개발 서버를 실행합니다.
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+브라우저에서 `http://localhost:3000`으로 접속하여 확인합니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+#### Docker로 실행
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Docker가 설치되어 있다면 다음 명령어로 실행할 수 있습니다.
 
-## Learn More
+ **이미지 빌드**:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+docker build -t rebalancing-app .
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**컨테이너 실행**:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+docker run -p 3000:3000 rebalancing-app
+```
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
