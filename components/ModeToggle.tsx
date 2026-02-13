@@ -5,13 +5,15 @@ import { RefreshCw, Lock } from "lucide-react";
 interface ModeToggleProps {
     mode: RebalanceMode;
     onChange: (mode: RebalanceMode) => void;
+    disabled?: boolean;
 }
 
-export function ModeToggle({ mode, onChange }: ModeToggleProps) {
+export function ModeToggle({ mode, onChange, disabled }: ModeToggleProps) {
     return (
-        <div className="glass-panel p-1 rounded-lg flex h-fit w-fit self-end">
+        <div className={cn("glass-panel p-1 rounded-lg flex h-fit w-fit self-end", disabled && "opacity-60 pointer-events-none")}>
             <button
                 onClick={() => onChange("full")}
+                disabled={disabled}
                 className={cn(
                     "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all",
                     mode === "full"
@@ -24,6 +26,7 @@ export function ModeToggle({ mode, onChange }: ModeToggleProps) {
             </button>
             <button
                 onClick={() => onChange("noSell")}
+                disabled={disabled}
                 className={cn(
                     "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all",
                     mode === "noSell"

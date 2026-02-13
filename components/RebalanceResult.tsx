@@ -1,13 +1,14 @@
 import { RebalanceResult } from "@/types/portfolio";
 import { cn } from "@/lib/utils";
-import { ArrowRight, Wallet } from "lucide-react";
+import { ArrowRight, Wallet, Check } from "lucide-react";
 
 interface RebalanceResultProps {
     plan: RebalanceResult[];
     projectedCash: number;
+    onApply?: () => void;
 }
 
-export function RebalanceResultTable({ plan, projectedCash }: RebalanceResultProps) {
+export function RebalanceResultTable({ plan, projectedCash, onApply }: RebalanceResultProps) {
     const hasActions = plan.some((item) => item.action !== "hold");
 
     if (plan.length === 0) return null;
@@ -19,16 +20,27 @@ export function RebalanceResultTable({ plan, projectedCash }: RebalanceResultPro
                     <ArrowRight className="w-5 h-5 text-primary" />
                     리밸런싱 계획
                 </h3>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 dark:bg-white/5 px-3 py-1 rounded-full">
-                    <Wallet className="w-4 h-4" />
-                    <span>예상 현금: </span>
-                    <span className="text-foreground font-medium">{projectedCash.toLocaleString()}</span>
+                <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 dark:bg-white/5 px-3 py-1 rounded-full">
+                        <Wallet className="w-4 h-4" />
+                        <span>예상 현금: </span>
+                        <span className="text-foreground font-medium">{projectedCash.toLocaleString()}</span>
+                    </div>
+                    {hasActions && onApply && (
+                        <button
+                            onClick={onApply}
+                            className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-lg shadow-green-600/20 hover:shadow-green-600/40 hover:scale-105 active:scale-95 transition-all text-sm"
+                        >
+                            <Check className="w-4 h-4" />
+                            적용하기
+                        </button>
+                    )}
                 </div>
             </div>
 
             {!hasActions ? (
                 <div className="p-8 text-center text-muted-foreground">
-                    조정이 필요하지 않습니다. 포트폴리오가 균형 상태입니다.
+                    ✅ 조정이 필요하지 않습니다. 포트폴리오가 균형 상태입니다.
                 </div>
             ) : (
                 <div className="overflow-x-auto">

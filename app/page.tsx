@@ -8,6 +8,7 @@ import { AssetTable } from "@/components/AssetTable";
 import { DonutChart } from "@/components/DonutChart";
 import { RebalanceResultTable } from "@/components/RebalanceResult";
 import { WeightValidation } from "@/components/WeightValidation";
+import { Pencil } from "lucide-react";
 
 export default function Home() {
   const {
@@ -18,6 +19,8 @@ export default function Home() {
     targetWeightSum,
     isCalculated,
     calculate,
+    resetCalculation,
+    applyPlan,
     addAsset,
     updateAsset,
     removeAsset,
@@ -34,8 +37,8 @@ export default function Home() {
         <div className="space-y-6">
           <div className="glass-panel p-6 rounded-xl space-y-4">
             <h2 className="text-lg font-semibold">설정</h2>
-            <CashInput value={portfolio.cash} onChange={setCash} />
-            <ModeToggle mode={portfolio.rebalanceMode} onChange={setRebalanceMode} />
+            <CashInput value={portfolio.cash} onChange={setCash} disabled={isCalculated} />
+            <ModeToggle mode={portfolio.rebalanceMode} onChange={setRebalanceMode} disabled={isCalculated} />
           </div>
 
           <div className="glass-panel p-6 rounded-xl">
@@ -57,6 +60,7 @@ export default function Home() {
               <AssetTable
                 assets={portfolio.assets}
                 totalValue={totalValue}
+                readOnly={isCalculated}
                 onUpdate={updateAsset}
                 onDelete={removeAsset}
                 onAdd={addAsset}
@@ -64,14 +68,24 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Calculate Button - positioned right after the table */}
+          {/* Calculate / Edit Button */}
           <div className="flex justify-center">
-            <button
-              onClick={calculate}
-              className="px-8 py-4 bg-primary text-primary-foreground font-bold rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 text-lg"
-            >
-              계산하기
-            </button>
+            {isCalculated ? (
+              <button
+                onClick={resetCalculation}
+                className="px-8 py-4 bg-muted text-foreground font-bold rounded-xl shadow-lg hover:bg-muted/80 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 text-lg border border-border"
+              >
+                <Pencil className="w-5 h-5" />
+                수정하기
+              </button>
+            ) : (
+              <button
+                onClick={calculate}
+                className="px-8 py-4 bg-primary text-primary-foreground font-bold rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 text-lg"
+              >
+                계산하기
+              </button>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -92,7 +106,7 @@ export default function Home() {
       </div>
 
       {isCalculated && (
-        <RebalanceResultTable plan={rebalancePlan} projectedCash={projectedCash} />
+        <RebalanceResultTable plan={rebalancePlan} projectedCash={projectedCash} onApply={applyPlan} />
       )}
     </main>
   );

@@ -68,11 +68,6 @@ export function usePortfolio() {
     const [projectedCash, setProjectedCash] = useState(0);
     const [isCalculated, setIsCalculated] = useState(false);
 
-    // Reset calculation when portfolio changes
-    useMemo(() => {
-        setIsCalculated(false);
-    }, [portfolio]);
-
     const calculate = () => {
         const plan = calculateRebalancePlan(portfolio.assets, portfolio.cash, portfolio.rebalanceMode);
         const nextCash = calculateProjectedCash(portfolio.cash, plan);
@@ -80,6 +75,39 @@ export function usePortfolio() {
         setRebalancePlan(plan);
         setProjectedCash(nextCash);
         setIsCalculated(true);
+    };
+
+    const resetCalculation = () => {
+        setIsCalculated(false);
+        setRebalancePlan([]);
+        setProjectedCash(0);
+    };
+
+    // Apply the rebalancing plan: update asset quantities and cash
+    const applyPlan = () => {
+        setPortfolio((prev) => {
+            const updatedAssets = prev.assets.map((asset) => {
+                const planItem = rebalancePlan.find((p) => p.assetId === asset.id);
+                if (!planItem || planItem.action === "hold") return asset;
+
+                const qtyChange = planItem.action === "buy" ? planItem.quantity : -planItem.quantity;
+                return { ...asset, quantity: asset.quantity + qtyChange };
+            });
+
+            return {
+                ...prev,
+                assets: updatedAssets,
+                cash: projectedCash,
+            };
+        });
+
+        // After applying, recalculate to show "no changes needed"
+        // We need a slight delay because setPortfolio is async
+        setTimeout(() => {
+            setRebalancePlan([]);
+            setProjectedCash(0);
+            setIsCalculated(false);
+        }, 0);
     };
 
     return {
@@ -90,6 +118,8 @@ export function usePortfolio() {
         targetWeightSum,
         isCalculated,
         calculate,
+        resetCalculation,
+        applyPlan,
         addAsset,
         updateAsset,
         removeAsset,
